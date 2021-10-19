@@ -8,11 +8,11 @@ pipeline {
             steps {
                 cleanWs()
                 sh 'echo ${bundle_name}'
-                git credentialsId: "git_hub_ssh", url: "git@github.com:XYZ/dss_pipeline.git"
+                git credentialsId: '${GIT_SSH_KEY}', url: '${GIT_URL}'
                 sh "cat requirements.txt"
                 withPythonEnv('python3') {
-                    sh "pip install -U pip"
-                    sh "pip install -r requirements.txt"
+                    sh "pip3 install -U pip"
+                    sh "pip3 install -r requirements.txt"
                 }
             }
         }
@@ -30,16 +30,6 @@ pipeline {
                 }
                 sh "echo DSS project bundle created and downloaded in local workspace"
                 sh "ls -la"
-                script {
-                    def server = Artifactory.server 'artifactory'
-                    def uploadSpec = """{
-                        "files": [{
-                          "pattern": "*.zip",
-                          "target": "generic-local/dss_bundle/"
-                        }]
-                    }"""
-                    def buildInfo = server.upload spec: uploadSpec, failNoOp: true
-                }
             }
         }
         stage('PREPROD_TEST') {
@@ -47,7 +37,7 @@ pipeline {
                 withPythonEnv('python3') {
                     sh "python 3_preprod_test/import_bundle.py '${DESIGN_URL}' '${DESIGN_API_KEY}' '${DSS_PROJECT}' ${bundle_name} '${AUTO_PREPROD_ID}'"
                     sh "pytest -s 3_preprod_test/run_test.py -o junit_family=xunit1 --host='${AUTO_PREPROD_URL}' --api='${AUTO_PREPROD_API_KEY}' --project='${DSS_PROJECT}' --junitxml=reports/PREPROD_TEST.xml"
-                }                
+                }
             }
         }
         stage('DEPLOY_TO_PROD') {
