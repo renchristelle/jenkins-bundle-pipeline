@@ -1,4 +1,4 @@
-
+import dataikuapi
 
 def trigger_scenario(
         scenario_name: dataikuapi.dss.scenario.DSSScenario
