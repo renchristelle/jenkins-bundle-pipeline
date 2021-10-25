@@ -32,6 +32,6 @@ def test_coding_recipes_complexity(params):
             code_analysis = cc_raw.analyze(payload)
             print(code_analysis)
             assert code_analysis.loc < 2000
-            assert code_analysis.lloc < 50
+            assert code_analysis.lloc < 1000
             v = cc_visitors.ComplexityVisitor.from_code(payload)
             assert v.complexity < 21, "Code complexity of recipe " + recipe["name"] + " is too complex: " + v.complexity + " > max value (21)"
